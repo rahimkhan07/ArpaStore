@@ -5,7 +5,7 @@ import { addToCart } from "../../redux/CartSlice";
 import { deleteFromWishlist } from "../../redux/WishlistSlice";
 import { toast } from "react-toastify";
 import { FaCartShopping, FaHeart } from "react-icons/fa6";
-import { Trash2 } from "lucide-react";
+import { FiTrash2 } from "react-icons/fi";
 
 const PINK = "#E91E8C";
 
@@ -50,8 +50,8 @@ export default function Wishlist() {
           </div>
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-            {wishlist.map((item, i) => (
-              <div key={i} className="rounded-2xl overflow-hidden transition hover:-translate-y-1 hover:shadow-lg"
+            {wishlist.map((item) => (
+              <div key={item.id} className="rounded-2xl overflow-hidden transition hover:-translate-y-1 hover:shadow-lg"
                 style={{ background: card, border: "1px solid #FFD6E7" }}>
                 <Link to={`/productinfo/${item.id}`}>
                   <div style={{ paddingBottom: "100%", position: "relative" }}>
@@ -76,7 +76,7 @@ export default function Wishlist() {
                         <button onClick={() => dispatch(deleteFromWishlist(item))}
                         className="w-7 h-7 rounded-full flex items-center justify-center transition hover:scale-110"
                         style={{ background: "rgba(239,68,68,0.1)", color: "#EF4444" }}>
-                        <Trash2 size={11} />
+                        <FiTrash2 style={{ fontSize: 11 }} />
                       </button>
                     </div>
                   </div>

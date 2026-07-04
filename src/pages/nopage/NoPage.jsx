@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Home } from "lucide-react";
+import { FiHome } from "react-icons/fi";
 import { useData } from "../../context/data/MyState";
 
 const PINK = "#E91E8C";
@@ -22,7 +22,7 @@ export default function NoPage() {
         <Link to="/"
           className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl text-white font-bold transition hover:opacity-90"
           style={{ background: "linear-gradient(135deg,#E91E8C,#9C27B0)" }}>
-          <Home size={16} /> Go Back Home
+          <FiHome style={{ fontSize: 16 }} /> Go Back Home
         </Link>
       </motion.div>
     </div>

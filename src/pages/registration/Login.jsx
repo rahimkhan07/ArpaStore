@@ -52,7 +52,7 @@ export default function Login() {
       if (snap.empty) {
         await addDoc(collection(firebaseDB, "users"), {
           name: result.user.displayName, uid: result.user.uid,
-          email: result.user.email, role: "brand",
+          email: result.user.email, role: "customer",
           avatar: result.user.photoURL, signedupAt: new Date().toISOString(),
         });
       }

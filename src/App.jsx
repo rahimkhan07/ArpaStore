@@ -1,5 +1,4 @@
 import { createBrowserRouter, Navigate, RouterProvider } from "react-router-dom";
-import { AnimatePresence } from "framer-motion";
 import Layout from "./components/layout/Layout";
 import Home from "./pages/home/Home.jsx";
 import Login from "./pages/registration/Login.jsx";
@@ -17,70 +16,71 @@ import AuthProvider from "./components/protector/AuthContext.jsx";
 import ProtectedRoute from "./components/protector/ProtectedRoute.jsx";
 import { ToastContainer, Bounce } from "react-toastify";
 import { useAuth } from "./components/protector/AuthContext.jsx";
+import Loader from "./components/loader/Loader.jsx";
 
 const ADMIN_EMAILS = ["i.raheem727@gmail.com", "asadalamaligg@gmail.com"];
 
 /* Redirect logged-in users away from login/signup */
 function GuestRoute({ children }) {
-  const { user } = useAuth();
+  const { user, authLoading } = useAuth();
+  if (authLoading) return <Loader />;
   if (user) return <Navigate to="/" replace />;
   return children;
 }
 
-/* Require authentication */
+/* Require auth — waits for Firebase to resolve first */
 function AuthRoute({ children }) {
-  const { user } = useAuth();
+  const { user, authLoading } = useAuth();
+  if (authLoading) return <Loader />;
   if (!user) return <Navigate to="/login" replace />;
   return children;
 }
 
 /* Admin-only guard */
 const AdminRoute = ({ children }) => {
+  const { user, authLoading } = useAuth();
+  if (authLoading) return <Loader />;
+  if (!user) return <Navigate to="/login" replace />;
   try {
     const admin = JSON.parse(localStorage.getItem("user"));
     if (admin && ADMIN_EMAILS.includes(admin.user.email)) return children;
   } catch {}
-  return <Navigate to="/login" replace />;
+  return <Navigate to="/" replace />;
 };
 
 function App() {
   const router = createBrowserRouter([
-    /* ── Auth pages ── */
     { path: "/login",  element: <GuestRoute><Login /></GuestRoute> },
     { path: "/signup", element: <GuestRoute><Signup /></GuestRoute> },
-
-    /* ── Main store (with navbar + footer) ── */
     {
       path: "/",
       element: <AuthRoute><Layout /></AuthRoute>,
       children: [
-        { index: true,                  element: <Home /> },
-        { path: "/allproducts",         element: <AllProducts /> },
-        { path: "/productinfo/:id",     element: <ProductInfo /> },
-        { path: "/cart",                element: <ProtectedRoute><Cart /></ProtectedRoute> },
-        { path: "/order",               element: <ProtectedRoute><Order /></ProtectedRoute> },
-        { path: "/wishlist",            element: <ProtectedRoute><Wishlist /></ProtectedRoute> },
-        { path: "/order-success",       element: <ProtectedRoute><OrderSuccess /></ProtectedRoute> },
-        { path: "/dashboard",           element: <AdminRoute><Dashboard /></AdminRoute> },
-        { path: "/*",                   element: <NoPage /> },
+        { index: true,             element: <Home /> },
+        { path: "/allproducts",    element: <AllProducts /> },
+        { path: "/productinfo/:id",element: <ProductInfo /> },
+        { path: "/cart",           element: <ProtectedRoute><Cart /></ProtectedRoute> },
+        { path: "/order",          element: <ProtectedRoute><Order /></ProtectedRoute> },
+        { path: "/wishlist",       element: <ProtectedRoute><Wishlist /></ProtectedRoute> },
+        { path: "/order-success",  element: <ProtectedRoute><OrderSuccess /></ProtectedRoute> },
+        { path: "/dashboard",      element: <AdminRoute><Dashboard /></AdminRoute> },
+        { path: "/*",              element: <NoPage /> },
       ],
     },
   ]);
 
   return (
-    <AnimatePresence mode="wait">
-      <AuthProvider>
-        <MyState>
-          <RouterProvider router={router} />
-          <ToastContainer
-            position="top-center"
-            autoClose={2000}
-            theme="colored"
-            transition={Bounce}
-          />
-        </MyState>
-      </AuthProvider>
-    </AnimatePresence>
+    <AuthProvider>
+      <MyState>
+        <RouterProvider router={router} />
+        <ToastContainer
+          position="top-center"
+          autoClose={2000}
+          theme="colored"
+          transition={Bounce}
+        />
+      </MyState>
+    </AuthProvider>
   );
 }
 

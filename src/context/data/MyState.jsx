@@ -125,8 +125,11 @@ function MyState({ children }) {
     const q = query(collection(firebaseDB, "orders"), orderBy("time"));
     const unsub = onSnapshot(q,
       snap => setOrder(snap.docs.map(d => ({ ...d.data(), id: d.id }))),
-      err => {
-        getDocs(q).then(snap => setOrder(snap.docs.map(d => ({ ...d.data(), id: d.id }))));
+      () => {
+        // Fallback without orderBy in case index is missing
+        getDocs(collection(firebaseDB, "orders"))
+          .then(snap => setOrder(snap.docs.map(d => ({ ...d.data(), id: d.id }))))
+          .catch(e => console.error("orders fallback:", e));
       }
     );
     return unsub;
@@ -220,18 +223,19 @@ function MyState({ children }) {
   }, []);
 
   const subscribeNewsletter = async (email) => {
-    if (!email || !email.includes("@")) return toast.warning("Enter a valid email.");
+    if (!email || !email.includes("@")) { toast.warning("Enter a valid email."); return false; }
     try {
       const snap = await getDocs(
         query(collection(firebaseDB, "newsletter"), where("email", "==", email))
       );
-      if (!snap.empty) return toast.info("You're already subscribed!");
+      if (!snap.empty) { toast.info("You're already subscribed!"); return false; }
       await addDoc(collection(firebaseDB, "newsletter"), {
         email, time: Timestamp.now(),
         date: new Date().toLocaleString("en-US", { month: "short", day: "2-digit", year: "numeric" }),
       });
       toast.success("Subscribed! 🎉");
-    } catch (e) { toast.error("Subscription failed."); }
+      return true; // caller uses this to clear the input
+    } catch (e) { toast.error("Subscription failed."); return false; }
   };
 
   const deleteSubscriber = async (id) => {

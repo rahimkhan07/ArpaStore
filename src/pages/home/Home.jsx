@@ -9,7 +9,7 @@ import { toast } from "react-toastify";
 import Slider from "react-slick";
 import { FaHeart, FaCartShopping } from "react-icons/fa6";
 import { FaStar, FaShieldAlt, FaTruck, FaGift } from "react-icons/fa";
-import { Search, ArrowRight, ShoppingBag } from "lucide-react";
+import { FiSearch, FiArrowRight, FiShoppingBag } from "react-icons/fi";
 import WhatsAppChat from "../../components/whatsapp/WhatsAppChat";
 
 const PINK   = "#E91E8C";
@@ -197,7 +197,7 @@ export default function Home() {
                     <Link to="/allproducts"
                       className="inline-flex items-center gap-2 px-8 py-3 rounded-full font-bold text-white shadow-lg transition hover:scale-105 mt-4"
                       style={{ background: PINK }}>
-                      <ShoppingBag size={16} /> Shop Now
+                      <FiShoppingBag style={{ fontSize: 16 }} /> Shop Now
                     </Link>
                   </div>
                 </div>
@@ -229,7 +229,7 @@ export default function Home() {
                     <Link to="/allproducts"
                       className="inline-flex items-center gap-2 px-8 py-3 rounded-full font-bold text-white shadow-lg transition hover:scale-105"
                       style={{ background: slide.accent }}>
-                      <ShoppingBag size={16} /> {slide.cta}
+                      <FiShoppingBag style={{ fontSize: 16 }} /> {slide.cta}
                     </Link>
                   </motion.div>
                 </div>
@@ -245,7 +245,7 @@ export default function Home() {
           <div className="flex gap-2 rounded-2xl p-2 shadow-md"
             style={{ background: card, border: `1px solid #FFD6E7` }}>
             <div className="relative flex-1">
-              <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: ROSE }} />
+              <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2" style={{ fontSize: 16, color: ROSE }} />
               <input
                 type="text"
                 placeholder="Search scrunchies, bows, clips…"
@@ -312,7 +312,7 @@ export default function Home() {
               <Link to="/allproducts"
                 className="flex items-center gap-1 text-sm font-semibold"
                 style={{ color: PINK }}>
-                View All <ArrowRight size={14} />
+                View All <FiArrowRight style={{ fontSize: 14 }} />
               </Link>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4">
@@ -335,7 +335,7 @@ export default function Home() {
               <Link to="/allproducts"
                 className="flex items-center gap-1 text-sm font-semibold"
                 style={{ color: LILAC }}>
-                View All <ArrowRight size={14} />
+                View All <FiArrowRight style={{ fontSize: 14 }} />
               </Link>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4">
@@ -419,13 +419,22 @@ function NewsletterInput({ mode, card, text }) {
       style={{ background: card, border: "1px solid #FFD6E7" }}>
       <input type="email" placeholder="your@email.com" value={email}
         onChange={e => setEmail(e.target.value)}
+        onKeyDown={async e => {
+          if (e.key === "Enter") {
+            const ok = await subscribeNewsletter(email);
+            if (ok) setEmail("");
+          }
+        }}
         className="flex-1 px-4 py-2.5 rounded-xl outline-none text-sm"
         style={{ background: "transparent", color: text }}
       />
       <button
-        onClick={() => { subscribeNewsletter(email); setEmail(""); }}
+        onClick={async () => {
+          const ok = await subscribeNewsletter(email);
+          if (ok) setEmail("");
+        }}
         className="px-5 py-2.5 rounded-xl font-semibold text-white text-sm transition hover:opacity-90"
-        style={{ background: PINK }}>
+        style={{ background: "#E91E8C" }}>
         Subscribe
       </button>
     </div>

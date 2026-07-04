@@ -3,16 +3,15 @@ import { useParams, useNavigate, Link } from "react-router-dom";
 import { useData } from "../../context/data/MyState";
 import { useDispatch, useSelector } from "react-redux";
 import { addToCart } from "../../redux/CartSlice";
-import { addToWishlist } from "../../redux/WishlistSlice";
+import { addToWishlist, deleteFromWishlist } from "../../redux/WishlistSlice";
 import { toast } from "react-toastify";
 import { motion } from "framer-motion";
 import { FaHeart, FaCartShopping, FaWhatsapp } from "react-icons/fa6";
 import { FaStar, FaShieldAlt, FaTruck } from "react-icons/fa";
-import { ArrowLeft, Package } from "lucide-react";
+import { FiArrowLeft, FiPackage } from "react-icons/fi";
 import Loader from "../../components/loader/Loader";
 
-const PINK  = "#E91E8C";
-const LILAC = "#C77DFF";
+const PINK = "#E91E8C";
 
 export default function ProductInfo() {
   const { id } = useParams();
@@ -23,64 +22,76 @@ export default function ProductInfo() {
   const wishlist  = useSelector(s => s.wishlist);
   const user = (() => { try { return JSON.parse(localStorage.getItem("user")); } catch { return null; } })();
 
-  const [activeImg, setActiveImg] = useState(0);
+  const [activeImg,    setActiveImg]    = useState(0);
   const [selectedSize, setSelectedSize] = useState(null);
-  const [wished, setWished] = useState(false);
 
-  const item = product.find(p => p.id === id);
+  const item    = product.find(p => p.id === id);
+  const isWished = wishlist.some(w => w.id === id);
 
-  useEffect(() => { window.scrollTo(0, 0); }, []);
-  useEffect(() => {
-    if (item) setWished(wishlist.some(w => w.id === item.id));
-  }, [item, wishlist]);
-
-  if (loading) return <Loader />;
-  if (!item) return (
-    <div className="min-h-screen flex flex-col items-center justify-center gap-4 px-4"
-      style={{ background: mode === "dark" ? "#1a0a14" : "#FFF5F7" }}>
-      <div className="text-5xl">😕</div>
-      <h2 className="text-xl font-bold" style={{ color: mode === "dark" ? "#FAFAFA" : "#2d2d2d" }}>Product not found</h2>
-      <Link to="/allproducts" className="px-6 py-2.5 rounded-full text-white font-semibold"
-        style={{ background: PINK }}>Browse Products</Link>
-    </div>
-  );
-
-  const images = [item.imageUrl, item.imageUrl2, item.imageUrl3, item.imageUrl4].filter(Boolean);
-  const related = product.filter(p => p.category === item.category && p.id !== id).slice(0, 4);
+  useEffect(() => { window.scrollTo(0, 0); }, [id]);
 
   const bg   = mode === "dark" ? "#1a0a14" : "#FFF5F7";
   const card = mode === "dark" ? "#2d1a26" : "#fff";
   const text = mode === "dark" ? "#FAFAFA" : "#2d2d2d";
   const muted= mode === "dark" ? "#c0a0b0" : "#888";
 
+  if (loading && !item) return <Loader />;
+
+  if (!item) return (
+    <div className="min-h-screen flex flex-col items-center justify-center gap-4 px-4"
+      style={{ background: bg }}>
+      <div className="text-5xl">😕</div>
+      <h2 className="text-xl font-bold" style={{ color: text }}>Product not found</h2>
+      <Link to="/allproducts"
+        className="px-6 py-2.5 rounded-full text-white font-semibold"
+        style={{ background: PINK }}>
+        Browse Products
+      </Link>
+    </div>
+  );
+
+  const images    = [item.imageUrl, item.imageUrl2, item.imageUrl3, item.imageUrl4].filter(Boolean);
+  const related   = product.filter(p => p.category === item.category && p.id !== id).slice(0, 4);
+
+  // Out of stock: only when stock field exists, is a number, and equals 0
+  const stockNum  = item.stock !== undefined && item.stock !== "" ? Number(item.stock) : null;
+  const outOfStock = stockNum !== null && stockNum === 0;
+
   const addCart = () => {
     if (!user) return toast.warning("Please login first!");
-    if (item.sizes?.length > 0 && !selectedSize) return toast.warning("Please select a size!");
-    const already = cartItems.some(c => c.id === item.id && (c.selectedSize === selectedSize || !item.sizes?.length));
-    if (already) return toast.info("Already in cart!");
+    if (item.sizes?.length > 0 && !selectedSize)
+      return toast.warning("Please select a size!");
+    // Check for exact duplicate (same id + same size)
+    const isDuplicate = cartItems.some(
+      c => c.id === item.id && (c.selectedSize ?? null) === (selectedSize ?? null)
+    );
+    if (isDuplicate) return toast.info("Already in cart!");
     dispatch(addToCart({ ...item, selectedSize }));
     toast.success("Added to cart 🛒");
   };
 
-  const addWish = () => {
+  const toggleWish = () => {
     if (!user) return toast.warning("Please login first!");
-    if (!wished) {
-      dispatch(addToWishlist(item));
-      setWished(true);
-      toast.success("Added to wishlist 💕");
+    if (isWished) {
+      dispatch(deleteFromWishlist(item));
+      toast.info("Removed from wishlist");
     } else {
-      toast.info("Already in wishlist!");
+      dispatch(addToWishlist(item));
+      toast.success("Added to wishlist 💕");
     }
   };
 
   const buyNow = () => {
     if (!user) return navigate("/login");
-    if (item.sizes?.length > 0 && !selectedSize) return toast.warning("Please select a size!");
-    dispatch(addToCart({ ...item, selectedSize }));
+    if (item.sizes?.length > 0 && !selectedSize)
+      return toast.warning("Please select a size!");
+    // Add to cart only if not already there
+    const isDuplicate = cartItems.some(
+      c => c.id === item.id && (c.selectedSize ?? null) === (selectedSize ?? null)
+    );
+    if (!isDuplicate) dispatch(addToCart({ ...item, selectedSize }));
     navigate("/cart");
   };
-
-  const outOfStock = Number(item.stock) === 0;
 
   return (
     <div className="min-h-screen" style={{ background: bg }}>
@@ -89,7 +100,7 @@ export default function ProductInfo() {
         <button onClick={() => navigate(-1)}
           className="flex items-center gap-2 text-sm font-medium mb-4"
           style={{ color: muted }}>
-          <ArrowLeft size={16} /> Back
+          <FiArrowLeft style={{ fontSize: 16 }} /> Back
         </button>
       </div>
 
@@ -105,7 +116,7 @@ export default function ProductInfo() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.3 }}
-                src={images[activeImg]}
+                src={images[activeImg] || "https://via.placeholder.com/600?text=🎀"}
                 alt={item.title}
                 className="absolute inset-0 w-full h-full object-cover"
                 onError={e => { e.target.src = "https://via.placeholder.com/600?text=ArpaStore"; }}
@@ -115,7 +126,6 @@ export default function ProductInfo() {
                   style={{ background: PINK }}>⭐ Bestseller</span>
               )}
             </div>
-            {/* Thumbnails */}
             {images.length > 1 && (
               <div className="flex gap-2">
                 {images.map((img, i) => (
@@ -131,12 +141,15 @@ export default function ProductInfo() {
 
           {/* ── Details ── */}
           <div className="flex flex-col">
-            <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: PINK }}>{item.category}</p>
+            <p className="text-xs font-semibold uppercase tracking-wider mb-2 capitalize"
+              style={{ color: PINK }}>{item.category}</p>
             <h1 className="text-2xl font-black mb-3" style={{ color: text }}>{item.title}</h1>
 
             {/* Price */}
             <div className="flex items-baseline gap-3 mb-4">
-              <span className="text-3xl font-black" style={{ color: PINK }}>₹{calcOffer(item.price)}</span>
+              <span className="text-3xl font-black" style={{ color: PINK }}>
+                ₹{calcOffer(item.price)}
+              </span>
               <span className="text-lg line-through" style={{ color: muted }}>₹{item.price}</span>
               <span className="text-xs font-bold px-2 py-1 rounded-full"
                 style={{ background: "#FFE4F0", color: PINK }}>10% OFF</span>
@@ -144,30 +157,37 @@ export default function ProductInfo() {
 
             {/* Stock */}
             <div className="flex items-center gap-2 mb-4">
-              <Package size={14} style={{ color: outOfStock ? "#EF4444" : "#10B981" }} />
+              <FiPackage style={{ fontSize: 14, color: outOfStock ? "#EF4444" : "#10B981" }} />
               <span className="text-sm font-medium"
                 style={{ color: outOfStock ? "#EF4444" : "#10B981" }}>
-                {outOfStock ? "Out of Stock" : item.stock ? `${item.stock} in stock` : "In Stock"}
+                {outOfStock
+                  ? "Out of Stock"
+                  : stockNum !== null
+                  ? `${stockNum} in stock`
+                  : "In Stock"}
               </span>
             </div>
 
             {/* Description */}
             {item.description && (
-              <p className="text-sm leading-relaxed mb-5" style={{ color: muted }}>{item.description}</p>
+              <p className="text-sm leading-relaxed mb-5" style={{ color: muted }}>
+                {item.description}
+              </p>
             )}
 
             {/* Sizes */}
             {item.sizes?.length > 0 && (
               <div className="mb-5">
-                <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: muted }}>Size</p>
+                <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: muted }}>
+                  Select Size
+                </p>
                 <div className="flex gap-2 flex-wrap">
                   {item.sizes.map(size => (
-                    <button key={size}
-                      onClick={() => setSelectedSize(size)}
+                    <button key={size} onClick={() => setSelectedSize(size)}
                       className="px-4 py-2 rounded-xl text-sm font-semibold border-2 transition"
                       style={{
-                        background: selectedSize === size ? PINK : card,
-                        color: selectedSize === size ? "#fff" : text,
+                        background:  selectedSize === size ? PINK : card,
+                        color:       selectedSize === size ? "#fff" : text,
                         borderColor: selectedSize === size ? PINK : "#FFD6E7",
                       }}>
                       {size}
@@ -178,30 +198,31 @@ export default function ProductInfo() {
             )}
 
             {/* Actions */}
-            <div className="flex gap-3 mb-5">
+            <div className="flex gap-3 mb-3">
               <button onClick={addCart} disabled={outOfStock}
                 className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-2xl font-bold text-white transition hover:opacity-90 disabled:opacity-50"
                 style={{ background: PINK }}>
-                <FaCartShopping /> {outOfStock ? "Out of Stock" : "Add to Cart"}
+                <FaCartShopping />
+                {outOfStock ? "Out of Stock" : "Add to Cart"}
               </button>
-              <button onClick={addWish}
+              <button onClick={toggleWish}
                 className="w-14 flex items-center justify-center rounded-2xl border-2 transition hover:scale-105"
                 style={{ borderColor: "#FFD6E7", background: card }}>
-                <FaHeart style={{ color: wished ? PINK : "#ccc", fontSize: 18 }} />
+                <FaHeart style={{ color: isWished ? PINK : "#ccc", fontSize: 18, transition: "color 0.2s" }} />
               </button>
             </div>
 
             <button onClick={buyNow} disabled={outOfStock}
-              className="w-full py-3.5 rounded-2xl font-bold transition hover:opacity-90 disabled:opacity-50"
+              className="w-full py-3.5 rounded-2xl font-bold transition hover:opacity-90 disabled:opacity-50 mb-3"
               style={{ background: "linear-gradient(135deg, #E91E8C, #9C27B0)", color: "#fff" }}>
               Buy Now
             </button>
 
             {/* WhatsApp */}
             <a
-              href={`https://wa.me/919876543210?text=Hi! I'm interested in "${item.title}" (₹${calcOffer(item.price)}). Can you help?`}
+              href={`https://wa.me/919876543210?text=${encodeURIComponent(`Hi! I'm interested in "${item.title}" (₹${calcOffer(item.price)}). Can you help?`)}`}
               target="_blank" rel="noreferrer"
-              className="mt-3 flex items-center justify-center gap-2 py-3 rounded-2xl font-semibold text-white transition hover:opacity-90"
+              className="flex items-center justify-center gap-2 py-3 rounded-2xl font-semibold text-white transition hover:opacity-90"
               style={{ background: "#25D366" }}>
               <FaWhatsapp size={16} /> Ask on WhatsApp
             </a>
@@ -209,8 +230,8 @@ export default function ProductInfo() {
             {/* Guarantees */}
             <div className="grid grid-cols-2 gap-3 mt-5">
               {[
-                { icon: <FaTruck />, label: "Free delivery above ₹499" },
-                { icon: <FaShieldAlt />, label: "Secure checkout" },
+                { icon: <FaTruck />,      label: "Free delivery above ₹499" },
+                { icon: <FaShieldAlt />,  label: "Secure checkout" },
               ].map((g, i) => (
                 <div key={i} className="flex items-center gap-2 p-3 rounded-xl"
                   style={{ background: mode === "dark" ? "#3d1a2e" : "#FFF0F5" }}>
@@ -225,16 +246,20 @@ export default function ProductInfo() {
         {/* ── Related Products ── */}
         {related.length > 0 && (
           <div className="mt-12">
-            <h2 className="text-xl font-black mb-5" style={{ color: text }}>You may also like 💕</h2>
+            <h2 className="text-xl font-black mb-5" style={{ color: text }}>
+              You may also like 💕
+            </h2>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
               {related.map(rel => (
                 <Link key={rel.id} to={`/productinfo/${rel.id}`}
-                  onClick={() => window.scrollTo(0, 0)}>
+                  onClick={() => { setActiveImg(0); setSelectedSize(null); window.scrollTo(0, 0); }}>
                   <div className="rounded-2xl overflow-hidden transition hover:-translate-y-1 hover:shadow-lg"
                     style={{ background: card, border: "1px solid #FFD6E7" }}>
                     <div style={{ paddingBottom: "100%", position: "relative" }}>
                       <img src={rel.imageUrl} alt={rel.title}
-                        className="absolute inset-0 w-full h-full object-cover" />
+                        className="absolute inset-0 w-full h-full object-cover"
+                        onError={e => { e.target.src = "https://via.placeholder.com/300?text=🎀"; }}
+                      />
                     </div>
                     <div className="p-3">
                       <p className="font-semibold text-xs truncate" style={{ color: text }}>{rel.title}</p>

@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { useState } from "react";
 import { useData } from "../../context/data/MyState";
-import { Instagram, Youtube, Mail, Phone, MapPin, ArrowRight } from "lucide-react";
+import { FiInstagram, FiYoutube, FiMail, FiPhone, FiMapPin, FiArrowRight } from "react-icons/fi";
 import { FaWhatsapp, FaTiktok } from "react-icons/fa";
 
 const PINK = "#E91E8C";
@@ -54,13 +54,22 @@ export default function Footer() {
             <div className="flex gap-2">
               <input type="email" placeholder="your@email.com" value={email}
                 onChange={e => setEmail(e.target.value)}
-                onKeyDown={e => e.key === "Enter" && subscribeNewsletter(email).then(() => setEmail(""))}
+                onKeyDown={async e => {
+                  if (e.key === "Enter") {
+                    const ok = await subscribeNewsletter(email);
+                    if (ok) setEmail("");
+                  }
+                }}
                 className="flex-1 px-3 py-2.5 rounded-xl text-sm outline-none"
                 style={{ background: "rgba(255,255,255,0.07)", border: `1px solid ${border}`, color: "#fff" }} />
-              <button onClick={() => subscribeNewsletter(email).then(ok => ok !== undefined && setEmail(""))}
+              <button
+                onClick={async () => {
+                  const ok = await subscribeNewsletter(email);
+                  if (ok) setEmail("");
+                }}
                 className="px-4 py-2.5 rounded-xl text-sm font-semibold text-white transition hover:opacity-90"
                 style={{ background: PINK }}>
-                <ArrowRight size={16} />
+                <FiArrowRight style={{ fontSize: 16 }} />
               </button>
             </div>
           </div>
@@ -112,9 +121,9 @@ export default function Footer() {
             </h4>
             <div className="space-y-3">
               {[
-                { icon: <Mail size={14}/>,   text: "hello@arpastore.com" },
-                { icon: <Phone size={14}/>,  text: "+91 98765 43210" },
-                { icon: <MapPin size={14}/>, text: "Mumbai, India" },
+                { icon: <FiMail style={{ fontSize: 14 }}/>,   text: "hello@arpastore.com" },
+                { icon: <FiPhone style={{ fontSize: 14 }}/>,  text: "+91 98765 43210" },
+                { icon: <FiMapPin style={{ fontSize: 14 }}/>, text: "Mumbai, India" },
               ].map((c, i) => (
                 <div key={i} className="flex items-center gap-2 text-sm" style={{ color: tm }}>
                   <span style={{ color: PINK }}>{c.icon}</span> {c.text}
@@ -133,9 +142,9 @@ export default function Footer() {
             {/* Socials */}
             <div className="flex gap-2 mt-4">
               {[
-                { icon: <Instagram size={15}/>, color: PINK,      href: "#" },
-                { icon: <FaTiktok size={13}/>,  color: "#FAFAFA", href: "#" },
-                { icon: <Youtube size={15}/>,   color: "#FF0000", href: "#" },
+                { icon: <FiInstagram style={{ fontSize: 15 }}/>, color: PINK,      href: "#" },
+                { icon: <FaTiktok style={{ fontSize: 13 }}/>,    color: "#FAFAFA", href: "#" },
+                { icon: <FiYoutube style={{ fontSize: 15 }}/>,   color: "#FF0000", href: "#" },
               ].map((s, i) => (
                 <a key={i} href={s.href}
                   className="w-9 h-9 rounded-xl flex items-center justify-center transition hover:scale-110"

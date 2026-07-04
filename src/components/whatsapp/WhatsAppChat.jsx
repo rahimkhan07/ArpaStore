@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaWhatsapp } from "react-icons/fa";
-import { X } from "lucide-react";
+import { FiX } from "react-icons/fi";
 
 const WHATSAPP_NUMBER = "919876543210"; // Replace with real number
 
@@ -33,7 +33,7 @@ export default function WhatsAppChat() {
                 </div>
               </div>
               <button onClick={() => setOpen(false)} className="text-white/80 hover:text-white transition">
-                <X size={16} />
+                <FiX style={{ fontSize: 16 }} />
               </button>
             </div>
 
@@ -79,7 +79,7 @@ export default function WhatsAppChat() {
         onClick={() => setOpen(p => !p)}
         className="w-14 h-14 rounded-full flex items-center justify-center shadow-xl transition"
         style={{ background: "#25D366", boxShadow: "0 8px 25px rgba(37,211,102,0.4)" }}>
-        {open ? <X size={22} className="text-white" /> : <FaWhatsapp size={26} className="text-white" />}
+        {open ? <FiX style={{ fontSize: 22 }} className="text-white" /> : <FaWhatsapp size={26} className="text-white" />}
       </motion.button>
     </div>
   );

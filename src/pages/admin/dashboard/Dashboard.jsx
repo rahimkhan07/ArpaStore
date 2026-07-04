@@ -6,9 +6,9 @@ import UpdateProduct from "../page/UpdateProduct";
 import ManageSlider from "../page/ManageSlider";
 import jsPDF from "jspdf";
 import {
-  Package, ShoppingBag, Users, TrendingUp, Trash2, CheckCircle,
-  XCircle, Edit, Bell, Tag, FileDown,
-} from "lucide-react";
+  FiPackage, FiShoppingBag, FiUsers, FiTrendingUp, FiTrash2, FiCheckCircle,
+  FiEdit2, FiBell, FiTag, FiDownload,
+} from "react-icons/fi";
 
 const PINK   = "#E91E8C";
 const LILAC  = "#9C27B0";
@@ -42,7 +42,6 @@ export default function Dashboard() {
   } = useData();
 
   const [tab, setTab] = useState("overview");
-  const [editProduct, setEditProduct] = useState(null);
 
   const analytics = getAnalytics();
 
@@ -112,14 +111,14 @@ export default function Dashboard() {
   const tm    = "#888";
 
   const STAT_CARDS = [
-    { label: "Total Products",  val: analytics.totalProducts,   icon: <Package size={18}/>,    color: PINK  },
-    { label: "Total Orders",    val: analytics.totalOrders,     icon: <ShoppingBag size={18}/>, color: LILAC },
-    { label: "Pending Orders",  val: analytics.pendingOrders,   icon: <Bell size={18}/>,        color: GOLD  },
-    { label: "Confirmed",       val: analytics.confirmedOrders, icon: <CheckCircle size={18}/>, color: "#10B981" },
-    { label: "Revenue (est.)",  val: `₹${analytics.totalRevenue}`, icon: <TrendingUp size={18}/>, color: "#3B82F6" },
-    { label: "Total Users",     val: analytics.totalUsers,      icon: <Users size={18}/>,       color: "#F97316" },
-    { label: "Low Stock",       val: analytics.lowStockItems,   icon: <Tag size={18}/>,         color: "#EF4444" },
-    { label: "Subscribers",     val: analytics.totalSubscribers,icon: <Bell size={18}/>,        color: "#8B5CF6" },
+    { label: "Total Products",  val: analytics.totalProducts,   icon: <FiPackage style={{ fontSize: 18 }}/>,    color: PINK  },
+    { label: "Total Orders",    val: analytics.totalOrders,     icon: <FiShoppingBag style={{ fontSize: 18 }}/>, color: LILAC },
+    { label: "Pending Orders",  val: analytics.pendingOrders,   icon: <FiBell style={{ fontSize: 18 }}/>,        color: GOLD  },
+    { label: "Confirmed",       val: analytics.confirmedOrders, icon: <FiCheckCircle style={{ fontSize: 18 }}/>, color: "#10B981" },
+    { label: "Revenue (est.)",  val: `₹${analytics.totalRevenue}`, icon: <FiTrendingUp style={{ fontSize: 18 }}/>, color: "#3B82F6" },
+    { label: "Total Users",     val: analytics.totalUsers,      icon: <FiUsers style={{ fontSize: 18 }}/>,       color: "#F97316" },
+    { label: "Low Stock",       val: analytics.lowStockItems,   icon: <FiTag style={{ fontSize: 18 }}/>,         color: "#EF4444" },
+    { label: "Subscribers",     val: analytics.totalSubscribers,icon: <FiBell style={{ fontSize: 18 }}/>,        color: "#8B5CF6" },
   ];
 
   const TABS = [
@@ -235,7 +234,7 @@ export default function Dashboard() {
                     onClick={downloadOrdersPDF}
                     className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-white transition hover:opacity-90"
                     style={{ background: "linear-gradient(135deg,#E91E8C,#9C27B0)" }}>
-                    <FileDown size={14} /> Download PDF
+                    <FiDownload style={{ fontSize: 14 }} /> Download PDF
                   </button>
                 </div>
                 <table className="w-full text-sm min-w-[700px]">
@@ -285,7 +284,7 @@ export default function Dashboard() {
                         <button onClick={() => deleteOrder(o.id)}
                           className="p-1.5 rounded-lg"
                           style={{ background: "rgba(239,68,68,0.1)", color: "#EF4444" }}>
-                          <Trash2 size={13} />
+                          <FiTrash2 style={{ fontSize: 13 }} />
                         </button>
                       </td>
                     </tr>
@@ -343,12 +342,12 @@ export default function Dashboard() {
                           <button onClick={() => handleEditProduct(item)}
                             className="p-1.5 rounded-lg"
                             style={{ background: "rgba(233,30,140,0.1)", color: PINK }}>
-                            <Edit size={13} />
+                            <FiEdit2 style={{ fontSize: 13 }} />
                           </button>
                           <button onClick={() => deleteProduct(item.id)}
                             className="p-1.5 rounded-lg"
                             style={{ background: "rgba(239,68,68,0.1)", color: "#EF4444" }}>
-                            <Trash2 size={13} />
+                            <FiTrash2 style={{ fontSize: 13 }} />
                           </button>
                         </div>
                       </td>
@@ -422,7 +421,7 @@ export default function Dashboard() {
                       <button onClick={() => deleteUser(u.docId)}
                         className="p-1.5 rounded-lg"
                         style={{ background: "rgba(239,68,68,0.1)", color: "#EF4444" }}>
-                        <Trash2 size={13} />
+                        <FiTrash2 style={{ fontSize: 13 }} />
                       </button>
                     </td>
                   </tr>
@@ -462,7 +461,7 @@ export default function Dashboard() {
                         <button onClick={() => deleteSubscriber(sub.id)}
                           className="p-1.5 rounded-lg"
                           style={{ background: "rgba(239,68,68,0.1)", color: "#EF4444" }}>
-                          <Trash2 size={13} />
+                          <FiTrash2 style={{ fontSize: 13 }} />
                         </button>
                       </td>
                     </tr>

@@ -22,7 +22,4 @@ const auth       = getAuth(app);
 const googleProvider = new GoogleAuthProvider();
 const storage    = getStorage(app);
 
-// Debug — remove after testing
-console.log("🪣 Storage bucket:", storage?.app?.options?.storageBucket);
-
 export { firebaseDB, auth, googleProvider, storage };

@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useData } from "../../context/data/MyState";
 import Loader from "../../components/loader/Loader";
 
@@ -16,6 +16,7 @@ const STATUS_CONFIG = {
 export default function Order() {
   const user = (() => { try { return JSON.parse(localStorage.getItem("user")); } catch { return null; } })();
   const { mode, loading, order, calcOffer } = useData();
+  const navigate = useNavigate();
 
   useEffect(() => { window.scrollTo(0, 0); }, []);
 
@@ -24,20 +25,26 @@ export default function Order() {
   const text = mode === "dark" ? "#FAFAFA" : "#2d2d2d";
   const muted= mode === "dark" ? "#c0a0b0" : "#888";
 
-  const userOrders = user ? order.filter(o => o.userid === user.user.uid) : [];
+  const userOrders = user
+    ? [...order].filter(o => o.userid === user.user.uid).reverse()
+    : [];
 
   return (
     <div className="min-h-screen py-8 px-4" style={{ background: bg }}>
       {loading && <Loader />}
 
       <div className="max-w-3xl mx-auto">
-        <h1 className="text-2xl font-black mb-6 text-center" style={{ color: text }}>My Orders 🎀</h1>
+        <h1 className="text-2xl font-black mb-6 text-center" style={{ color: text }}>
+          My Orders 🎀
+        </h1>
 
-        {userOrders.length === 0 ? (
+        {userOrders.length === 0 && !loading ? (
           <div className="text-center py-20">
             <div className="text-6xl mb-4">📦</div>
             <h3 className="text-xl font-bold mb-2" style={{ color: text }}>No orders yet</h3>
-            <p className="text-sm mb-6" style={{ color: muted }}>Start shopping and your orders will appear here.</p>
+            <p className="text-sm mb-6" style={{ color: muted }}>
+              Start shopping and your orders will appear here.
+            </p>
             <Link to="/allproducts"
               className="inline-block px-8 py-3 rounded-full font-bold text-white"
               style={{ background: PINK }}>
@@ -46,19 +53,26 @@ export default function Order() {
           </div>
         ) : (
           <div className="space-y-5">
-            {[...userOrders].reverse().map((orderItem, idx) => {
+            {userOrders.map((orderItem) => {
               const status = orderItem.status || "pending";
               const { label, bg: sBg, color } = STATUS_CONFIG[status] || STATUS_CONFIG.pending;
 
               return (
-                <div key={idx} className="rounded-2xl overflow-hidden shadow-sm"
+                // Use stable paymentId as key
+                <div key={orderItem.paymentId || orderItem.id}
+                  className="rounded-2xl overflow-hidden shadow-sm"
                   style={{ background: card, border: "1px solid #FFD6E7" }}>
+
                   {/* Header */}
                   <div className="flex flex-wrap items-center justify-between px-5 py-4 gap-3"
-                    style={{ background: mode === "dark" ? "#3d1a2e" : "#FFF0F5",
-                      borderBottom: "1px solid #FFD6E7" }}>
+                    style={{
+                      background: mode === "dark" ? "#3d1a2e" : "#FFF0F5",
+                      borderBottom: "1px solid #FFD6E7",
+                    }}>
                     <div>
-                      <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: muted }}>Order ID</p>
+                      <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: muted }}>
+                        Order ID
+                      </p>
                       <p className="font-bold text-sm" style={{ color: PINK }}>{orderItem.paymentId}</p>
                     </div>
                     <div>
@@ -71,18 +85,26 @@ export default function Order() {
                     </span>
                   </div>
 
-                  {/* Cart Items */}
+                  {/* Items */}
                   <div className="divide-y" style={{ borderColor: "#FFE4F0" }}>
-                    {(orderItem.cartItems || []).map((item, i) => (
-                      <div key={i} className="flex items-center gap-4 px-5 py-4 cursor-pointer hover:opacity-80 transition"
-                        onClick={() => (window.location.href = `/productinfo/${item.id}`)}>
-                        <img src={item.imageUrl} alt={item.title}
-                          className="w-14 h-14 rounded-xl object-cover flex-shrink-0" />
+                    {(orderItem.cartItems || []).map((item) => (
+                      <div
+                        key={`${item.id}-${item.selectedSize ?? "default"}`}
+                        className="flex items-center gap-4 px-5 py-4 cursor-pointer hover:opacity-80 transition"
+                        onClick={() => navigate(`/productinfo/${item.id}`)}>
+                        <img
+                          src={item.imageUrl}
+                          alt={item.title}
+                          className="w-14 h-14 rounded-xl object-cover flex-shrink-0"
+                          onError={e => { e.target.src = "https://via.placeholder.com/56?text=🎀"; }}
+                        />
                         <div className="flex-1 min-w-0">
                           <p className="font-bold text-sm truncate" style={{ color: text }}>{item.title}</p>
-                          <p className="text-xs mt-0.5" style={{ color: muted }}>{item.category}</p>
+                          <p className="text-xs mt-0.5 capitalize" style={{ color: muted }}>{item.category}</p>
                           {item.selectedSize && (
-                            <p className="text-xs mt-0.5" style={{ color: muted }}>Size: {item.selectedSize}</p>
+                            <p className="text-xs mt-0.5" style={{ color: muted }}>
+                              Size: {item.selectedSize}
+                            </p>
                           )}
                         </div>
                         <div className="text-right flex-shrink-0">
@@ -95,8 +117,11 @@ export default function Order() {
 
                   {/* Address */}
                   <div className="px-5 py-3 text-xs flex flex-wrap gap-4"
-                    style={{ background: mode === "dark" ? "#3d1a2e" : "#FFF8FB",
-                      borderTop: "1px solid #FFD6E7", color: muted }}>
+                    style={{
+                      background: mode === "dark" ? "#3d1a2e" : "#FFF8FB",
+                      borderTop: "1px solid #FFD6E7",
+                      color: muted,
+                    }}>
                     <span>📍 {orderItem.addressInfo?.address}, {orderItem.addressInfo?.pincode}</span>
                     <span>📞 {orderItem.addressInfo?.phoneNumber}</span>
                     <span>👤 {orderItem.addressInfo?.name}</span>

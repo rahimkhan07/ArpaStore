@@ -1,20 +1,16 @@
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import Loader from "../loader/Loader.jsx";
+import { Navigate } from "react-router-dom";
 import { useAuth } from "./AuthContext.jsx";
+import Loader from "../loader/Loader.jsx";
 
 function ProtectedRoute({ children }) {
-  const navigate = useNavigate();
-  const { user } = useAuth();
-  const [isLoading, setIsLoading] = useState(true);
+  const { user, authLoading } = useAuth();
 
-  useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 800);
-    return () => clearTimeout(timer);
-  }, []);
+  // Wait for Firebase auth to resolve before deciding
+  if (authLoading) return <Loader />;
 
-  if (isLoading) return <Loader />;
-  if (!user) { navigate("/login"); return null; }
+  // Use Navigate (declarative) — never call navigate() during render
+  if (!user) return <Navigate to="/login" replace />;
+
   return children;
 }
 

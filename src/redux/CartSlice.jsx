@@ -1,22 +1,25 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-// jab cart item me koi data nahi hoga to empty array dikhega aur data hoga to whi show karega
-const initialState = JSON.parse(localStorage.getItem('cart')) ?? [];
-
 const cartSlice = createSlice({
-  name: 'cart',
-  initialState,
+  name: "cart",
+  initialState: [],
   reducers: {
-    addToCart: function(state, action) {
+    addToCart(state, action) {
       state.push(action.payload);
     },
+    // Match by id AND selectedSize so different size variants coexist
     deleteFromCart(state, action) {
-      return state.filter((item) => item.id !== action.payload.id);
-    }
-  }
+      const { id, selectedSize } = action.payload;
+      const idx = state.findIndex(
+        item => item.id === id && (item.selectedSize ?? null) === (selectedSize ?? null)
+      );
+      if (idx !== -1) state.splice(idx, 1);
+    },
+    clearCart() {
+      return [];
+    },
+  },
 });
 
-//exporting these function to make global fn.
-export const {addToCart, deleteFromCart} = cartSlice.actions;
-
+export const { addToCart, deleteFromCart, clearCart } = cartSlice.actions;
 export default cartSlice.reducer;

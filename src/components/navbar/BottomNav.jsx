@@ -1,17 +1,17 @@
 import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Home, ShoppingBag, ShoppingCart, Heart, User } from "lucide-react";
+import { FiHome, FiShoppingBag, FiShoppingCart, FiHeart, FiUser } from "react-icons/fi";
 import { useSelector } from "react-redux";
 import { useAuth } from "../protector/AuthContext";
 
 const PINK = "#E91E8C";
 
 const NAV_ITEMS = [
-  { to: "/",            icon: Home,         label: "Home" },
-  { to: "/allproducts", icon: ShoppingBag,  label: "Shop" },
-  { to: "/cart",        icon: ShoppingCart, label: "Cart" },
-  { to: "/wishlist",    icon: Heart,        label: "Wishlist" },
-  { to: "/order",       icon: User,         label: "Orders" },
+  { to: "/",            icon: FiHome,         label: "Home" },
+  { to: "/allproducts", icon: FiShoppingBag,  label: "Shop" },
+  { to: "/cart",        icon: FiShoppingCart, label: "Cart" },
+  { to: "/wishlist",    icon: FiHeart,        label: "Wishlist" },
+  { to: "/order",       icon: FiUser,         label: "Orders" },
 ];
 
 export default function BottomNav() {
@@ -62,8 +62,9 @@ export default function BottomNav() {
               <motion.div animate={{ scale: active ? 1.1 : 1 }}
                 transition={{ type: "spring", stiffness: 400, damping: 25 }}
                 className="relative">
-                <Icon size={22} strokeWidth={active ? 2.5 : 1.75}
+                <Icon
                   style={{
+                    fontSize: 22,
                     color: active ? PINK : "#bbb",
                     fill: active && isWish ? PINK : "none",
                     transition: "color 0.2s",

@@ -6,7 +6,7 @@ import { addToCart } from "../../redux/CartSlice";
 import { addToWishlist } from "../../redux/WishlistSlice";
 import { toast } from "react-toastify";
 import { FaHeart, FaCartShopping } from "react-icons/fa6";
-import { Search, SlidersHorizontal, X, Package } from "lucide-react";
+import { FiSearch, FiSliders, FiX, FiPackage } from "react-icons/fi";
 import { motion, AnimatePresence } from "framer-motion";
 import WhatsAppChat from "../../components/whatsapp/WhatsAppChat";
 
@@ -117,7 +117,7 @@ export default function AllProducts() {
           <div className="flex gap-2 flex-wrap">
             {/* Search */}
             <div className="relative flex-1 min-w-[180px]">
-              <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: PINK }} />
+              <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2" style={{ fontSize: 15, color: PINK }} />
               <input
                 type="text"
                 placeholder="Search products…"
@@ -130,7 +130,7 @@ export default function AllProducts() {
                 <button onClick={() => setSearchkey("")}
                   className="absolute right-3 top-1/2 -translate-y-1/2"
                   style={{ color: muted }}>
-                  <X size={14} />
+                  <FiX style={{ fontSize: 14 }} />
                 </button>
               )}
             </div>
@@ -150,7 +150,7 @@ export default function AllProducts() {
               onClick={() => setShowFilters(p => !p)}
               className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold sm:hidden"
               style={{ background: PINK, color: "#fff" }}>
-              <SlidersHorizontal size={14} />
+              <FiSliders style={{ fontSize: 14 }} />
               {showFilters ? "Hide" : "Filters"}
             </button>
           </div>
@@ -197,7 +197,7 @@ export default function AllProducts() {
             {filtered.length === 0 ? (
               /* Empty state */
               <div className="text-center py-20">
-                <Package size={52} style={{ color: "#FFD6E7", margin: "0 auto 16px" }} />
+                <FiPackage style={{ fontSize: 52, color: "#FFD6E7", display: "block", margin: "0 auto 16px" }} />
                 <h3 className="text-lg font-bold mb-2" style={{ color: text }}>
                   {product.length === 0 ? "No products yet" : "No products found"}
                 </h3>

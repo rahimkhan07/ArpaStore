@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useData } from "../../../context/data/MyState";
 import { storage } from "../../../firebase/FirebaseConfig";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { Trash2, Plus, Image, ImagePlus, Loader2 } from "lucide-react";
+import { FiTrash2, FiPlus, FiImage, FiLoader } from "react-icons/fi";
 import { toast } from "react-toastify";
 
 const PINK = "#E91E8C";
@@ -22,6 +22,8 @@ function ManageSlider() {
     if (!file.type.startsWith("image/")) return toast.error("Please select an image file.");
     if (file.size > 5 * 1024 * 1024) return toast.error("Max file size is 5 MB.");
 
+    // Save ref BEFORE async — React synthetic events are pooled and nullified
+    const inputEl    = e.target;
     const fileName   = `${Date.now()}_${file.name.replace(/\s+/g, "_")}`;
     const storageRef = ref(storage, `slider/${fileName}`);
     const task       = uploadBytesResumable(storageRef, file);
@@ -44,7 +46,7 @@ function ManageSlider() {
         } else {
           toast.error(`Upload failed: ${error.message}`);
         }
-        e.target.value = "";
+        if (inputEl) inputEl.value = "";
       },
       async () => {
         try {
@@ -56,7 +58,7 @@ function ManageSlider() {
         } finally {
           setUploading(false);
           setProgress(0);
-          e.target.value = "";
+          if (inputEl) inputEl.value = "";
         }
       }
     );
@@ -115,7 +117,7 @@ function ManageSlider() {
             }}>
             {uploading ? (
               <div className="flex flex-col items-center gap-3">
-                <Loader2 size={40} className="animate-spin" style={{ color: PINK }} />
+                <FiLoader style={{ fontSize: 40, color: PINK }} className="animate-spin" />
                 <p className="font-black text-2xl" style={{ color: PINK }}>{progress}%</p>
                 <div className="w-56 h-3 rounded-full overflow-hidden" style={{ background: "#FFD6E7" }}>
                   <div
@@ -130,7 +132,7 @@ function ManageSlider() {
               </div>
             ) : (
               <>
-                <ImagePlus size={44} style={{ color: PINK }} />
+                <FiImage style={{ fontSize: 44, color: PINK }} />
                 <div className="text-center">
                   <p className="font-bold" style={{ color: "#2d2d2d" }}>Click to choose image</p>
                   <p className="text-xs mt-1" style={{ color: "#aaa" }}>JPG, PNG, WebP — max 5 MB</p>
@@ -174,7 +176,7 @@ function ManageSlider() {
               disabled={!imageUrl.trim()}
               className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold text-white transition hover:opacity-90 disabled:opacity-50"
               style={{ background: "linear-gradient(135deg,#E91E8C,#9C27B0)" }}>
-              <Plus size={14} /> Add
+              <FiPlus style={{ fontSize: 14 }} /> Add
             </button>
           </div>
           {imageUrl && (
@@ -196,7 +198,7 @@ function ManageSlider() {
       {sliderImages.length === 0 ? (
         <div className="text-center py-14 rounded-2xl"
           style={{ background: "#FFF5F7", border: "1.5px dashed #FFD6E7" }}>
-          <Image size={40} style={{ color: "#FFD6E7", margin: "0 auto 12px" }} />
+          <FiImage style={{ fontSize: 40, color: "#FFD6E7", display: "block", margin: "0 auto 12px" }} />
           <p className="text-sm" style={{ color: "#bbb" }}>No slides yet — add one above.</p>
         </div>
       ) : (
@@ -222,7 +224,7 @@ function ManageSlider() {
                   onClick={() => deleteSliderImage(img.id)}
                   className="p-2 rounded-xl transition hover:scale-110 flex-shrink-0"
                   style={{ background: "rgba(239,68,68,0.1)", color: "#EF4444" }}>
-                  <Trash2 size={14} />
+                  <FiTrash2 style={{ fontSize: 14 }} />
                 </button>
               </div>
             </div>

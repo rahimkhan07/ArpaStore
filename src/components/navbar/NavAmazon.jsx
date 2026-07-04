@@ -7,9 +7,9 @@ import { auth } from "../../firebase/FirebaseConfig";
 import { toast } from "react-toastify";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  Search, ShoppingCart, Heart, ChevronDown, LogOut,
-  LayoutDashboard, User, Package, Sun, Moon,
-} from "lucide-react";
+  FiSearch, FiShoppingCart, FiHeart, FiChevronDown, FiLogOut,
+  FiGrid, FiUser, FiPackage, FiSun, FiMoon,
+} from "react-icons/fi";
 
 const PINK   = "#E91E8C";
 const ADMIN_EMAILS = ["i.raheem727@gmail.com", "asadalamaligg@gmail.com"];
@@ -107,8 +107,8 @@ export default function Navbar() {
             {/* ── Search ── */}
             <div className="hidden md:flex flex-1 max-w-[280px]">
               <div className="relative w-full">
-                <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"
-                  style={{ color: searchFocus ? PINK : mutedColor, transition: "color 0.2s" }} />
+                <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"
+                  style={{ fontSize: 14, color: searchFocus ? PINK : mutedColor, transition: "color 0.2s" }} />
                 <input type="text" placeholder="Search accessories…"
                   value={searchkey}
                   onChange={e => setSearchkey(e.target.value)}
@@ -132,7 +132,7 @@ export default function Navbar() {
               <button onClick={toggleMode}
                 className="w-9 h-9 rounded-xl flex items-center justify-center transition"
                 style={{ color: mutedColor, background: mode === "dark" ? "rgba(255,255,255,0.08)" : "rgba(233,30,140,0.08)" }}>
-                {mode === "dark" ? <Sun size={16} /> : <Moon size={16} />}
+                {mode === "dark" ? <FiSun style={{ fontSize: 16 }} /> : <FiMoon style={{ fontSize: 16 }} />}
               </button>
 
               {user ? (
@@ -140,7 +140,7 @@ export default function Navbar() {
                   {/* Wishlist */}
                   <Link to="/wishlist" className="relative w-9 h-9 rounded-xl hidden sm:flex items-center justify-center transition"
                     style={{ color: PINK, background: "rgba(233,30,140,0.08)" }}>
-                    <Heart size={16} strokeWidth={2} />
+                    <FiHeart style={{ fontSize: 16 }} />
                     {wishlist.length > 0 && (
                       <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full text-white text-[9px] font-bold flex items-center justify-center"
                         style={{ background: PINK }}>{wishlist.length}</span>
@@ -150,7 +150,7 @@ export default function Navbar() {
                   {/* Cart */}
                   <Link to="/cart" className="relative w-9 h-9 rounded-xl flex items-center justify-center transition"
                     style={{ color: PINK, background: "rgba(233,30,140,0.08)" }}>
-                    <ShoppingCart size={16} strokeWidth={2} />
+                    <FiShoppingCart style={{ fontSize: 16 }} />
                     {cartItems.length > 0 && (
                       <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full text-white text-[9px] font-bold flex items-center justify-center"
                         style={{ background: PINK }}>{cartItems.length}</span>
@@ -169,7 +169,7 @@ export default function Navbar() {
                         style={{ background: "linear-gradient(135deg,#E91E8C,#9C27B0)" }}>
                         {userInitial}
                       </div>
-                      <ChevronDown size={13} style={{ color: mutedColor, transform: dropOpen ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s" }} />
+                      <FiChevronDown style={{ fontSize: 13, color: mutedColor, transform: dropOpen ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s" }} />
                     </button>
 
                     <AnimatePresence>
@@ -196,8 +196,8 @@ export default function Navbar() {
                           </div>
 
                           {[
-                            { to: "/order",    icon: <Package size={14}/>,         label: "My Orders" },
-                            { to: "/wishlist", icon: <Heart size={14}/>,            label: "Wishlist" },
+                            { to: "/order",    icon: <FiPackage style={{ fontSize: 14 }}/>,         label: "My Orders" },
+                            { to: "/wishlist", icon: <FiHeart style={{ fontSize: 14 }}/>,            label: "Wishlist" },
                           ].map(item => (
                             <Link key={item.to} to={item.to}
                               onClick={() => setDropOpen(false)}
@@ -217,7 +217,7 @@ export default function Navbar() {
                               style={{ color: "#F59E0B" }}
                               onMouseEnter={e => e.currentTarget.style.background = "rgba(245,158,11,0.08)"}
                               onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
-                              <LayoutDashboard size={14} /> Admin Dashboard
+                              <FiGrid style={{ fontSize: 14 }} /> Admin Dashboard
                             </Link>
                           )}
 
@@ -228,7 +228,7 @@ export default function Navbar() {
                             style={{ color: "#EF4444" }}
                             onMouseEnter={e => e.currentTarget.style.background = "rgba(239,68,68,0.08)"}
                             onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
-                            <LogOut size={14} /> Sign Out
+                            <FiLogOut style={{ fontSize: 14 }} /> Sign Out
                           </button>
                         </motion.div>
                       )}

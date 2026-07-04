@@ -11,7 +11,7 @@
  *  3. Replace CLOUD_NAME below with your Cloudinary cloud name
  */
 import { useState, useRef } from "react";
-import { ImagePlus, X, Loader2, CheckCircle, AlertCircle } from "lucide-react";
+import { FiImage, FiX, FiLoader, FiCheckCircle, FiAlertCircle } from "react-icons/fi";
 import { toast } from "react-toastify";
 
 // ─── CLOUDINARY CONFIG ───────────────────────────────────────────
@@ -129,14 +129,14 @@ export default function ImageUploadSlot({ label, value, onChange, required = fal
           />
           <div className="absolute bottom-1 right-1 w-5 h-5 rounded-full flex items-center justify-center"
             style={{ background: "#10B981" }}>
-            <CheckCircle size={12} color="white" />
+            <FiCheckCircle style={{ fontSize: 12, color: "white" }} />
           </div>
           <button
             type="button"
             onClick={reset}
             className="absolute -top-2 -right-2 w-6 h-6 rounded-full flex items-center justify-center text-white shadow-md"
             style={{ background: "#EF4444" }}>
-            <X size={11} />
+            <FiX style={{ fontSize: 11 }} />
           </button>
         </div>
       ) : (
@@ -161,7 +161,7 @@ export default function ImageUploadSlot({ label, value, onChange, required = fal
           {uploading ? (
             /* Uploading state */
             <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:4 }}>
-              <Loader2 size={22} style={{ color: PINK, animation: "spin 1s linear infinite" }} />
+              <FiLoader style={{ fontSize: 22, color: PINK }} className="animate-spin" />
               <span style={{ fontSize: 11, fontWeight: 800, color: PINK }}>{progress}%</span>
               <div style={{ width: 56, height: 5, background: "#FFD6E7", borderRadius: 99, overflow: "hidden" }}>
                 <div style={{
@@ -176,7 +176,7 @@ export default function ImageUploadSlot({ label, value, onChange, required = fal
           ) : error ? (
             /* Error state */
             <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:3, padding:"0 4px" }}>
-              <AlertCircle size={20} style={{ color: "#EF4444" }} />
+              <FiAlertCircle style={{ fontSize: 20, color: "#EF4444" }} />
               <span style={{ fontSize: 9, color: "#EF4444", textAlign:"center", fontWeight:600 }}>
                 Retry
               </span>
@@ -184,7 +184,7 @@ export default function ImageUploadSlot({ label, value, onChange, required = fal
           ) : (
             /* Idle state */
             <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:3, padding:"0 4px" }}>
-              <ImagePlus size={22} style={{ color: PINK }} />
+              <FiImage style={{ fontSize: 22, color: PINK }} />
               <span style={{ fontSize: 10, color: PINK, textAlign:"center", fontWeight:600, lineHeight:1.2 }}>
                 Click to upload
               </span>
