@@ -7,9 +7,9 @@ import { addToCart } from "../../redux/CartSlice";
 import { addToWishlist } from "../../redux/WishlistSlice";
 import { toast } from "react-toastify";
 import Slider from "react-slick";
-import { FaHeart, FaCartShopping, FaWhatsapp } from "react-icons/fa6";
+import { FaHeart, FaCartShopping } from "react-icons/fa6";
 import { FaStar, FaShieldAlt, FaTruck, FaGift } from "react-icons/fa";
-import { Search, ArrowRight, Sparkles, ShoppingBag } from "lucide-react";
+import { Search, ArrowRight, ShoppingBag } from "lucide-react";
 import WhatsAppChat from "../../components/whatsapp/WhatsAppChat";
 
 const PINK   = "#E91E8C";
@@ -138,7 +138,7 @@ function MiniProductCard({ item }) {
 }
 
 export default function Home() {
-  const { product, hairCategories, mode } = useData();
+  const { product, hairCategories, mode, sliderImages } = useData();
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [activeSlide, setActiveSlide] = useState(0);
@@ -180,38 +180,63 @@ export default function Home() {
 
       {/* ── HERO SLIDER ── */}
       <section className="relative">
-        <Slider {...sliderSettings}>
-          {HERO_SLIDES.map((slide, i) => (
-            <div key={i}>
-              <div
-                className="flex flex-col items-center justify-center text-center py-16 px-4 sm:py-24 min-h-[360px] sm:min-h-[440px]"
-                style={{ background: slide.bg }}
-              >
-                <motion.div
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6 }}
-                >
-                  <div className="text-5xl sm:text-7xl mb-4">{slide.emoji}</div>
-                  <h1 className="text-3xl sm:text-5xl font-black mb-2" style={{ color: slide.accent }}>
-                    {slide.title}
-                  </h1>
-                  <h2 className="text-2xl sm:text-4xl font-black mb-4" style={{ color: "#2d2d2d" }}>
-                    {slide.sub}
-                  </h2>
-                  <p className="text-sm sm:text-base mb-8 max-w-md mx-auto" style={{ color: "#555" }}>
-                    {slide.desc}
-                  </p>
-                  <Link to="/allproducts"
-                    className="inline-flex items-center gap-2 px-8 py-3 rounded-full font-bold text-white shadow-lg transition hover:scale-105"
-                    style={{ background: slide.accent }}>
-                    <ShoppingBag size={16} /> {slide.cta}
-                  </Link>
-                </motion.div>
+        {sliderImages.length > 0 ? (
+          /* Admin-uploaded full-image slides */
+          <Slider {...sliderSettings}>
+            {sliderImages.map((img, i) => (
+              <div key={i}>
+                <div className="relative" style={{ height: "420px" }}>
+                  <img
+                    src={img.imageUrl}
+                    alt={`Slide ${i + 1}`}
+                    className="w-full h-full object-cover"
+                    onError={e => { e.target.style.display = "none"; }}
+                  />
+                  <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4"
+                    style={{ background: "rgba(0,0,0,0.25)" }}>
+                    <Link to="/allproducts"
+                      className="inline-flex items-center gap-2 px-8 py-3 rounded-full font-bold text-white shadow-lg transition hover:scale-105 mt-4"
+                      style={{ background: PINK }}>
+                      <ShoppingBag size={16} /> Shop Now
+                    </Link>
+                  </div>
+                </div>
               </div>
-            </div>
-          ))}
-        </Slider>
+            ))}
+          </Slider>
+        ) : (
+          /* Default branded slides */
+          <Slider {...sliderSettings}>
+            {HERO_SLIDES.map((slide, i) => (
+              <div key={i}>
+                <div
+                  className="flex flex-col items-center justify-center text-center py-16 px-4 sm:py-24 min-h-[360px] sm:min-h-[440px]"
+                  style={{ background: slide.bg }}>
+                  <motion.div
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6 }}>
+                    <div className="text-5xl sm:text-7xl mb-4">{slide.emoji}</div>
+                    <h1 className="text-3xl sm:text-5xl font-black mb-2" style={{ color: slide.accent }}>
+                      {slide.title}
+                    </h1>
+                    <h2 className="text-2xl sm:text-4xl font-black mb-4" style={{ color: "#2d2d2d" }}>
+                      {slide.sub}
+                    </h2>
+                    <p className="text-sm sm:text-base mb-8 max-w-md mx-auto" style={{ color: "#555" }}>
+                      {slide.desc}
+                    </p>
+                    <Link to="/allproducts"
+                      className="inline-flex items-center gap-2 px-8 py-3 rounded-full font-bold text-white shadow-lg transition hover:scale-105"
+                      style={{ background: slide.accent }}>
+                      <ShoppingBag size={16} /> {slide.cta}
+                    </Link>
+                  </motion.div>
+                </div>
+              </div>
+            ))}
+          </Slider>
+        )}
       </section>
 
       {/* ── SEARCH BAR ── */}

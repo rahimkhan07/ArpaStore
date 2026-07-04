@@ -1,111 +1,70 @@
 import { useData } from "../../context/data/MyState";
-import { FiSearch } from "react-icons/fi";
+import { Search, X } from "lucide-react";
+
+const PINK = "#E91E8C";
 
 function Filter() {
-  const context = useData();
   const {
     mode,
-    searchkey,
-    setSearchkey,
-    filterType,
-    setFilterType,
-    filterPrice,
-    setFilterPrice,
+    searchkey, setSearchkey,
+    filterType, setFilterType,
     product,
-    resetFilter
-  } = context;
+    resetFilter,
+    hairCategories,
+  } = useData();
 
+  const bg   = mode === "dark" ? "#2d1a26" : "#FFF5F7";
+  const card = mode === "dark" ? "#3d1a2e" : "#fff";
+  const text = mode === "dark" ? "#FAFAFA" : "#2d2d2d";
 
   return (
+    <div className="container mx-auto px-4 mt-5 md:hidden">
+      <div className="p-4 rounded-2xl"
+        style={{ background: card, border: "1.5px solid #FFD6E7" }}>
 
-    <div>
-  <div className="container mx-auto px-4 mt-5 md:hidden">
-    <div
-      className="p-5 rounded-lg drop-shadow-xl border"
-      style={{
-        backgroundColor: mode === "dark" ? "#232F3E" : "#f3f4f6",
-        color: mode === "dark" ? "#ffffff" : "#111",
-        borderColor: mode === "dark" ? "#37475A" : "#d1d5db",
-      }}
-    >
-      <div className="relative">
-        <div className="absolute flex items-center ml-2 h-full text-gray-500">
-          <FiSearch />
+        {/* Search */}
+        <div className="relative mb-3">
+          <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2"
+            style={{ color: PINK }} />
+          <input
+            type="text"
+            value={searchkey}
+            onChange={e => setSearchkey(e.target.value)}
+            placeholder="Search accessories…"
+            className="w-full pl-9 pr-9 py-2.5 rounded-xl text-sm outline-none"
+            style={{ background: bg, border: "1.5px solid #FFD6E7", color: text }}
+          />
+          {searchkey && (
+            <button onClick={() => setSearchkey("")}
+              className="absolute right-3 top-1/2 -translate-y-1/2"
+              style={{ color: "#bbb" }}>
+              <X size={14} />
+            </button>
+          )}
         </div>
-        <input
-          type="text"
-          name="searchkey"
-          id="searchkey"
-          value={searchkey}
-          onChange={(e) => setSearchkey(e.target.value)}
-          placeholder="Search for products"
-          className="px-10 py-3 w-full rounded-md border outline-none text-sm transition-all duration-300"
-          style={{
-            backgroundColor: mode === "dark" ? "#37475A" : "#ffffff",
-            color: mode === "dark" ? "#ffffff" : "#111",
-            border: mode === "dark" ? "1px solid #485769" : "1px solid #FF9900",
-          }}
-        />
-      </div>
 
-      <div className="flex items-center justify-between mt-4">
-        <p className="font-semibold text-sm">Filters</p>
-        <button 
-        onClick={resetFilter}
-          className="px-4 py-2 bg-[#FF9900] hover:bg-[#e68a00] text-white text-sm font-medium rounded-md transition-colors cursor-pointer"
-        >
-          Reset Filter
-        </button>
-      </div>
-
-      <div>
-        <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 mt-4">
+        {/* Category select */}
+        <div className="flex gap-2">
           <select
             value={filterType}
-            onChange={(e) => setFilterType(e.target.value)}
-            className="px-4 py-3 w-full rounded-md bg-white border text-sm outline-none transition focus:ring-2 focus:ring-[#FF9900]"
-            style={{
-              backgroundColor: mode === "dark" ? "#37475A" : "#ffffff",
-              color: mode === "dark" ? "#ffffff" : "#111",
-            }}
-          >
-            <option value="">All</option>
-            {[...new Set(product.map((item) => item.category))].map(
-              (item, idx) => (
-                <option
-                  key={idx}
-                  value={item.replace(/\s+/g, "").toLowerCase()}
-                >
-                  {item}
-                </option>
-              )
-            )}
+            onChange={e => setFilterType(e.target.value)}
+            className="flex-1 px-3 py-2.5 rounded-xl text-sm outline-none"
+            style={{ background: bg, border: "1.5px solid #FFD6E7", color: text }}>
+            <option value="">All Categories</option>
+            {(hairCategories || []).slice(1).map(cat => (
+              <option key={cat.id} value={cat.id}>{cat.emoji} {cat.label}</option>
+            ))}
           </select>
 
-          <select
-            value={filterPrice}
-            onChange={(e) => setFilterPrice(e.target.value)}
-            className="px-4 py-3 w-full rounded-md bg-white border text-sm outline-none transition focus:ring-2 focus:ring-[#FF9900]"
-            style={{
-              backgroundColor: mode === "dark" ? "#37475A" : "#ffffff",
-              color: mode === "dark" ? "#ffffff" : "#111",
-            }}
-          >
-            <option value="">All</option>
-            {[...new Set(product.map((item) => item.price))].map(
-              (item, idx) => (
-                <option key={idx} value={item}>
-                  {item}
-                </option>
-              )
-            )}
-          </select>
+          <button
+            onClick={resetFilter}
+            className="px-4 py-2.5 rounded-xl text-sm font-semibold text-white transition hover:opacity-90"
+            style={{ background: PINK }}>
+            Reset
+          </button>
         </div>
       </div>
     </div>
-  </div>
-</div>
-
   );
 }
 
