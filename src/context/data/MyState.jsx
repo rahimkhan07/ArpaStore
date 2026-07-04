@@ -56,13 +56,18 @@ function MyState({ children }) {
     const q = query(collection(firebaseDB, "products"), orderBy("time"));
     const unsub = onSnapshot(q,
       snap => {
+        console.log("✅ Products loaded:", snap.docs.length);
         setProduct(snap.docs.map(d => ({ ...d.data(), id: d.id })));
         setLoading(false);
       },
       err => {
-        console.error("products snapshot:", err);
-        getDocs(q).then(snap => {
+        console.error("❌ products snapshot error:", err.code, err.message);
+        // Fallback: try getDocs without orderBy (works even if index missing)
+        getDocs(collection(firebaseDB, "products")).then(snap => {
+          console.log("✅ Products fallback loaded:", snap.docs.length);
           setProduct(snap.docs.map(d => ({ ...d.data(), id: d.id })));
+        }).catch(e => {
+          console.error("❌ products getDocs fallback error:", e.code, e.message);
         }).finally(() => setLoading(false));
       }
     );

@@ -168,7 +168,7 @@ export default function Home() {
   };
 
   const featuredProducts = product.filter(p => p.featured).slice(0, 8);
-  const latestProducts   = product.slice(-8).reverse();
+  const latestProducts   = [...product].reverse().slice(0, 8);
 
   const bg   = mode === "dark" ? "#1a0a14" : CREAM;
   const card = mode === "dark" ? "#2d1a26" : "#fff";
