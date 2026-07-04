@@ -15,8 +15,12 @@ const PINK  = "#E91E8C";
 const LILAC = "#C77DFF";
 
 export default function AllProducts() {
-  const { product, loading, hairCategories, calcOffer, mode, searchkey, setSearchkey,
-          filterType, setFilterType } = useData();
+  const {
+    product, loading, hairCategories, calcOffer, mode,
+    searchkey, setSearchkey,
+    filterType, setFilterType,
+  } = useData();
+
   const dispatch  = useDispatch();
   const cartItems = useSelector(s => s.cart);
   const wishlist  = useSelector(s => s.wishlist);
@@ -31,11 +35,10 @@ export default function AllProducts() {
     return obj;
   });
 
-  // Sync URL params → filter state
   useEffect(() => {
-    const q = searchParams.get("q");
+    const q   = searchParams.get("q");
     const cat = searchParams.get("cat");
-    if (q) setSearchkey(q);
+    if (q)   setSearchkey(q);
     if (cat) setFilterType(cat);
     window.scrollTo(0, 0);
   }, []);
@@ -45,7 +48,6 @@ export default function AllProducts() {
   const text = mode === "dark" ? "#FAFAFA" : "#2d2d2d";
   const muted= mode === "dark" ? "#c0a0b0" : "#888";
 
-  /* ── Filter + Sort ── */
   let filtered = product
     .filter(item => {
       const q = searchkey.toLowerCase();
@@ -66,8 +68,7 @@ export default function AllProducts() {
   const addCart = (item, e) => {
     e.preventDefault();
     if (!user) return toast.warning("Please login first!");
-    const already = cartItems.some(c => c.id === item.id);
-    if (already) return toast.info("Already in cart!");
+    if (cartItems.some(c => c.id === item.id)) return toast.info("Already in cart!");
     dispatch(addToCart(item));
     toast.success("Added to cart 🛒");
   };
@@ -98,7 +99,6 @@ export default function AllProducts() {
             }
           </h1>
 
-          {/* Search + Filters row */}
           <div className="flex gap-2 flex-wrap">
             {/* Search */}
             <div className="relative flex-1 min-w-[180px]">
@@ -137,17 +137,15 @@ export default function AllProducts() {
             </button>
           </div>
 
-          {/* Category Pills — desktop always visible, mobile collapsible */}
+          {/* Category Pills */}
           <div className={`mt-3 flex flex-wrap gap-2 ${showFilters ? "flex" : "hidden sm:flex"}`}>
             {hairCategories.map(cat => (
               <button key={cat.id}
                 onClick={() => setFilterType(cat.id === "all" ? "" : cat.id)}
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition hover:scale-105"
                 style={{
-                  background: (filterType === cat.id || (cat.id === "all" && !filterType))
-                    ? PINK : card,
-                  color: (filterType === cat.id || (cat.id === "all" && !filterType))
-                    ? "#fff" : PINK,
+                  background: (filterType === cat.id || (cat.id === "all" && !filterType)) ? PINK : card,
+                  color:      (filterType === cat.id || (cat.id === "all" && !filterType)) ? "#fff" : PINK,
                   border: "1.5px solid #FFD6E7",
                 }}>
                 {cat.emoji} {cat.label}
@@ -159,7 +157,9 @@ export default function AllProducts() {
 
       {/* ── Product Grid ── */}
       <div className="max-w-7xl mx-auto px-4 py-6">
-        <p className="text-xs mb-4" style={{ color: muted }}>{filtered.length} product{filtered.length !== 1 ? "s" : ""} found</p>
+        <p className="text-xs mb-4" style={{ color: muted }}>
+          {filtered.length} product{filtered.length !== 1 ? "s" : ""} found
+        </p>
 
         {filtered.length === 0 ? (
           <div className="text-center py-20">
@@ -177,6 +177,7 @@ export default function AllProducts() {
             <AnimatePresence>
               {filtered.map((item, i) => {
                 const isWished = wishedIds[item.id] || wishlist.some(w => w.id === item.id);
+                const outOfStock = Number(item.stock) === 0;
                 return (
                   <motion.div key={item.id}
                     initial={{ opacity: 0, y: 16 }}
@@ -186,25 +187,24 @@ export default function AllProducts() {
                     <Link to={`/productinfo/${item.id}`}>
                       <div
                         className="group rounded-2xl overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-xl h-full flex flex-col"
-                        style={{ background: card, border: "1px solid #FFD6E7", boxShadow: "0 2px 12px rgba(233,30,140,0.06)" }}
-                      >
+                        style={{ background: card, border: "1px solid #FFD6E7", boxShadow: "0 2px 12px rgba(233,30,140,0.06)" }}>
                         {/* Image */}
                         <div className="relative overflow-hidden" style={{ paddingBottom: "100%" }}>
                           <img
                             src={item.imageUrl}
                             alt={item.title}
                             className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                            onError={e => { e.target.src = "https://via.placeholder.com/300x300?text=Arpa+Store"; }}
+                            onError={e => { e.target.src = "https://via.placeholder.com/300x300?text=ArpaStore"; }}
                           />
-                          {item.featured && (
+                          {item.featured && !outOfStock && (
                             <span className="absolute top-2 left-2 text-[10px] font-bold px-2 py-1 rounded-full text-white"
                               style={{ background: PINK }}>⭐ Best</span>
                           )}
-                          {item.stock && Number(item.stock) <= 5 && Number(item.stock) > 0 && (
+                          {!outOfStock && Number(item.stock) > 0 && Number(item.stock) <= 5 && (
                             <span className="absolute top-2 left-2 text-[10px] font-bold px-2 py-1 rounded-full text-white"
                               style={{ background: "#FF6B35" }}>Only {item.stock} left!</span>
                           )}
-                          {item.stock && Number(item.stock) === 0 && (
+                          {outOfStock && (
                             <div className="absolute inset-0 flex items-center justify-center"
                               style={{ background: "rgba(0,0,0,0.4)" }}>
                               <span className="text-white font-bold text-xs px-3 py-1 rounded-full"
@@ -228,7 +228,7 @@ export default function AllProducts() {
                               <span className="text-xs line-through ml-1" style={{ color: "#ccc" }}>₹{item.price}</span>
                             </div>
                             <button onClick={e => addCart(item, e)}
-                              disabled={Number(item.stock) === 0}
+                              disabled={outOfStock}
                               className="w-8 h-8 rounded-full flex items-center justify-center text-white transition hover:scale-110 disabled:opacity-40"
                               style={{ background: PINK }}>
                               <FaCartShopping style={{ fontSize: 11 }} />
