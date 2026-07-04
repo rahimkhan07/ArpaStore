@@ -1,6 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { FiHome, FiShoppingBag, FiShoppingCart, FiHeart, FiUser } from "react-icons/fi";
+import { FiHome, FiShoppingBag, FiShoppingCart, FiHeart, FiPackage } from "react-icons/fi";
 import { useSelector } from "react-redux";
 import { useAuth } from "../protector/AuthContext";
 
@@ -11,7 +11,7 @@ const NAV_ITEMS = [
   { to: "/allproducts", icon: FiShoppingBag,  label: "Shop" },
   { to: "/cart",        icon: FiShoppingCart, label: "Cart" },
   { to: "/wishlist",    icon: FiHeart,        label: "Wishlist" },
-  { to: "/order",       icon: FiUser,         label: "Orders" },
+  { to: "/order",       icon: FiPackage,      label: "Orders" },
 ];
 
 export default function BottomNav() {
