@@ -4,9 +4,10 @@ import { useData } from "../../../context/data/MyState";
 import AddProduct from "../page/AddProduct";
 import UpdateProduct from "../page/UpdateProduct";
 import ManageSlider from "../page/ManageSlider";
+import jsPDF from "jspdf";
 import {
   Package, ShoppingBag, Users, TrendingUp, Trash2, CheckCircle,
-  XCircle, Truck, Edit, BarChart2, Image, Bell, Tag,
+  XCircle, Edit, Bell, Tag, FileDown,
 } from "lucide-react";
 
 const PINK   = "#E91E8C";
@@ -44,6 +45,65 @@ export default function Dashboard() {
   const [editProduct, setEditProduct] = useState(null);
 
   const analytics = getAnalytics();
+
+  const downloadOrdersPDF = () => {
+    const pdf = new jsPDF("p", "mm", "a4");
+    const pW = pdf.internal.pageSize.getWidth();
+    const pH = pdf.internal.pageSize.getHeight();
+    const mg = 14;
+    let y = mg;
+
+    const newPage = (need = 10) => {
+      if (y + need > pH - mg) { pdf.addPage(); y = mg; }
+    };
+
+    pdf.setFontSize(18); pdf.setTextColor(233, 30, 140);
+    pdf.text("ArpaStore — Order Report", pW / 2, y, { align: "center" });
+    y += 6;
+    pdf.setFontSize(9); pdf.setTextColor(150, 100, 120);
+    pdf.text(`Generated: ${new Date().toLocaleString()}`, pW / 2, y, { align: "center" });
+    y += 8;
+    pdf.setDrawColor(255, 214, 231); pdf.setLineWidth(0.4);
+    pdf.line(mg, y, pW - mg, y); y += 6;
+
+    [...order].reverse().forEach((o) => {
+      newPage(40);
+      pdf.setFillColor(255, 245, 247);
+      pdf.roundedRect(mg, y, pW - mg * 2, 20, 3, 3, "F");
+      pdf.setFontSize(8); pdf.setTextColor(150, 100, 120);
+      pdf.text("ORDER ID", mg + 3, y + 5);
+      pdf.text("CUSTOMER", mg + 55, y + 5);
+      pdf.text("PHONE", mg + 95, y + 5);
+      pdf.text("DATE", mg + 130, y + 5);
+      pdf.text("STATUS", mg + 165, y + 5);
+      pdf.setFontSize(9); pdf.setTextColor(45, 45, 45);
+      pdf.text(String(o.paymentId || ""), mg + 3, y + 13, { maxWidth: 48 });
+      pdf.text(String(o.addressInfo?.name || ""), mg + 55, y + 13, { maxWidth: 36 });
+      pdf.text(String(o.addressInfo?.phoneNumber || ""), mg + 95, y + 13);
+      pdf.text(String(o.date || ""), mg + 130, y + 13, { maxWidth: 32 });
+      const sc = { confirmed: [16, 185, 129], pending: [233, 30, 140], cancelled: [239, 68, 68], shipped: [59, 130, 246], delivered: [6, 95, 70] };
+      const [r, g, b] = sc[o.status || "pending"] || sc.pending;
+      pdf.setTextColor(r, g, b);
+      pdf.text((o.status || "pending").toUpperCase(), mg + 165, y + 13);
+      y += 24;
+
+      (o.cartItems || []).forEach((item) => {
+        newPage(10);
+        pdf.setFillColor(249, 245, 250);
+        pdf.roundedRect(mg + 2, y, pW - mg * 2 - 4, 9, 2, 2, "F");
+        pdf.setFontSize(8); pdf.setTextColor(45, 45, 45);
+        pdf.text(String(item.title || ""), mg + 5, y + 6, { maxWidth: 100 });
+        pdf.setTextColor(233, 30, 140);
+        pdf.text(`Rs.${item.price}`, pW - mg - 4, y + 6, { align: "right" });
+        y += 11;
+      });
+
+      pdf.setDrawColor(255, 214, 231); pdf.setLineWidth(0.3);
+      pdf.line(mg, y, pW - mg, y); y += 5;
+    });
+
+    pdf.save(`ArpaStore_Orders_${new Date().toLocaleDateString("en-GB").replace(/\//g, "-")}.pdf`);
+  };
 
   const bg    = "#FFF5F7";
   const card  = "#fff";
@@ -169,7 +229,16 @@ export default function Dashboard() {
                 <p className="text-sm mt-3" style={{ color: tm }}>No orders yet</p>
               </div>
             ) : (
-              <table className="w-full text-sm min-w-[700px]">
+              <>
+                <div className="p-4 flex justify-end" style={{ borderBottom: `1px solid ${border}` }}>
+                  <button
+                    onClick={downloadOrdersPDF}
+                    className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-white transition hover:opacity-90"
+                    style={{ background: "linear-gradient(135deg,#E91E8C,#9C27B0)" }}>
+                    <FileDown size={14} /> Download PDF
+                  </button>
+                </div>
+                <table className="w-full text-sm min-w-[700px]">
                 <thead>
                   <tr style={{ borderBottom: `1px solid ${border}` }}>
                     {["#", "Order ID", "Customer", "Items", "Date", "Status", "Actions"].map(h => (
@@ -223,6 +292,7 @@ export default function Dashboard() {
                   ))}
                 </tbody>
               </table>
+              </>
             )}
           </div>
         )}

@@ -243,6 +243,12 @@ function MyState({ children }) {
   const [filterType, setFilterType] = useState("");
   const [filterPrice, setFilterPrice] = useState("");
 
+  const resetFilter = () => {
+    setSearchkey("");
+    setFilterType("");
+    setFilterPrice("");
+  };
+
   /* ═══════════════════════════════════════════
      DISCOUNT / OFFER  (10% off)
   ═══════════════════════════════════════════ */
@@ -315,6 +321,7 @@ function MyState({ children }) {
       searchkey, setSearchkey,
       filterType, setFilterType,
       filterPrice, setFilterPrice,
+      resetFilter,
 
       /* Utilities */
       calcOffer,
