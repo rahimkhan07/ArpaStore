@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { FaWhatsapp } from "react-icons/fa";
 import { FiX } from "react-icons/fi";
 
-const WHATSAPP_NUMBER = "919876543210"; // Replace with real number
+const WHATSAPP_NUMBER = "918419050115"; 
 
 export default function WhatsAppChat() {
   const [open, setOpen] = useState(false);

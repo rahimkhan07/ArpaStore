@@ -8,7 +8,7 @@ import { toast } from "react-toastify";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   FiSearch, FiShoppingCart, FiHeart, FiChevronDown, FiLogOut,
-  FiGrid, FiUser, FiPackage, FiSun, FiMoon,
+  FiGrid, FiPackage,
 } from "react-icons/fi";
 
 const PINK   = "#E91E8C";
@@ -127,13 +127,6 @@ export default function Navbar() {
 
             {/* ── Right Icons ── */}
             <div className="flex items-center gap-1.5">
-
-              {/* Dark mode toggle */}
-              <button onClick={toggleMode}
-                className="w-9 h-9 rounded-xl flex items-center justify-center transition"
-                style={{ color: mutedColor, background: mode === "dark" ? "rgba(255,255,255,0.08)" : "rgba(233,30,140,0.08)" }}>
-                {mode === "dark" ? <FiSun style={{ fontSize: 16 }} /> : <FiMoon style={{ fontSize: 16 }} />}
-              </button>
 
               {user ? (
                 <>
